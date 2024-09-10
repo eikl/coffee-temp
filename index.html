@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            transition: color 0.3s;
+        }
+
+        .panel {
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .panel-heading {
+            background: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.3s;
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        .panel-body {
+            padding: 15px;
+            transition: background-color 0.3s;
+        }
+
+        #container1 {
+            width: 100%;
+            height: 400px;
+        }
+
+        .theme-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            z-index: 1000; /* Ensures it stays on top of other elements */
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .theme-toggle-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #f4f4f4;
+        }
+
+        body.dark-mode h1 {
+            color: #f4f4f4;
+        }
+
+        body.dark-mode .panel {
+            background-color: #333;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .panel-heading {
+            background-color: #444;
+        }
+
+        body.dark-mode .panel-title {
+            color: #f4f4f4;
+        }
+
+        body.dark-mode .panel-body {
+            background-color: #2a2a2a;
+        }
+
+        @media (max-width: 768px) {
+            .panel-title {
+                font-size: 16px;
+            }
+
+            .panel-body {
+                padding: 10px;
+            }
+
+            #container1 {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 22px;
+            }
+
+            .panel-heading {
+                padding: 8px 12px;
+            }
+
+            .panel-title {
+                font-size: 14px;
+            }
+
+            #container1 {
+                height: 250px;
+            }
+        }
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+        #themeToggleBtn {
+            top: 15px; /* Adjust for smaller screens */
+            right: 15px;
+            font-size: 14px;
+            padding: 8px 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        #themeToggleBtn {
+            top: 10px; /* Further adjust for very small screens */
+            right: 10px;
+            font-size: 12px;
+            padding: 6px 10px;
+        }
+    }
+
+    /* Ensure sufficient space around the title */
+    h1 {
+        margin-top: 60px; /* Add margin to accommodate the button */
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>OH:n kahvipannujen lämpötila</h1>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Tulkitse kahvitilanne itsenäisesti</strong></h3>
+            </div>
+            <div class="panel-body">
+                <div id="container1"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle-btn" id="themeToggleBtn">Toggle Dark Mode</button>
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="./main.js"></script>
+    <script>
+        // Define chart options for light mode
+        const lightModeOptions = {
+            chart: {
+                backgroundColor: '#ffffff',
+                style: {
+                    color: '#333333'
+                }
+            },
+            title: {
+                style: {
+                    color: '#333333'
+                }
+            },
+            xAxis: {
+                labels: {
+                    style: {
+                        color: '#333333'
+                    }
+                }
+            },
+            yAxis: {
+                labels: {
+                    style: {
+                        color: '#333333'
+                    }
+                },
+                title: {
+                    style: {
+                        color: '#333333'
+                    }
+                }
+            },
+            legend: {
+                itemStyle: {
+                    color: '#333333'
+                }
+            }
+        };
+
+        // Define chart options for dark mode
+        const darkModeOptions = {
+            chart: {
+                backgroundColor: '#1a1a1a',
+                style: {
+                    color: '#f4f4f4'
+                }
+            },
+            title: {
+                style: {
+                    color: '#f4f4f4'
+                }
+            },
+            xAxis: {
+                labels: {
+                    style: {
+                        color: '#f4f4f4'
+                    }
+                }
+            },
+            yAxis: {
+                labels: {
+                    style: {
+                        color: '#f4f4f4'
+                    }
+                },
+                title: {
+                    style: {
+                        color: '#f4f4f4'
+                    }
+                }
+            },
+            legend: {
+                itemStyle: {
+                    color: '#f4f4f4'
+                }
+            }
+        };
+
+        // Access the chart instance from main.js
+        const toggleBtn = document.getElementById('themeToggleBtn');
+
+        toggleBtn.addEventListener('click', () => {
+            const isDarkMode = document.body.classList.toggle('dark-mode');
+            toggleBtn.textContent = isDarkMode ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+            
+            // Update the chart options based on the current mode
+            myChart.update(isDarkMode ? darkModeOptions : lightModeOptions, true, {
+                duration: 1000
+            });
+            if (isDarkMode) {
+                localStorage.setItem('dark-mode','true')
+            } else {
+                localStorage.setItem('dark-mode','false')
+            }
+            
+        });
+
+        // Apply the saved theme on page load
+        window.addEventListener('load', () => {
+            const isDarkMode = localStorage.getItem('dark-mode') === 'true';
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                toggleBtn.textContent = 'Toggle Light Mode';
+                myChart.update(darkModeOptions);
+            }
+        });
+    </script>
+</body>
+
+</html>
