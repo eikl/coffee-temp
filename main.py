@@ -30,6 +30,9 @@ sampling_interval = 1.0
 collection_duration = 5
 max_buffer_length = 100  # 100 seconds of data
 
+# Add this near the top of your script, before the main loop
+last_archive_time = 0
+
 def calculate_average(data):
     return sum(data) / len(data) if data else 0
 
@@ -89,6 +92,40 @@ try:
 
         send_to_s3(timestamps, temperature1, temperature2)
         print('Sent data')
+        # Archive data every time buffer is full (100 seconds)
+        current_time = time.time()
+        if current_time - last_archive_time >= 100:  # 100 seconds
+            archive_data = {
+                "timestamps": timestamps.copy(),
+                "temperature1": temperature1.copy(),
+                "temperature2": temperature2.copy()
+            }
+            
+            try:
+                # Get existing archive data
+                response = s3_client.get_object(Bucket="oh-archive-bucket", Key="archive.json")
+                existing_data = json.loads(response['Body'].read().decode('utf-8'))
+                
+                # Append new data
+                existing_data["timestamps"].extend(archive_data["timestamps"])
+                existing_data["temperature1"].extend(archive_data["temperature1"])
+                existing_data["temperature2"].extend(archive_data["temperature2"])
+                
+            except s3_client.exceptions.NoSuchKey:
+                # File doesn't exist, create new structure
+                existing_data = archive_data
+            except Exception as e:
+                print(f"Error reading archive: {e}")
+                existing_data = archive_data
+            
+            # Upload updated archive
+            try:
+                archive_json = json.dumps(existing_data)
+                s3_client.put_object(Bucket="oh-archive-bucket", Key="archive.json", Body=archive_json)
+                print("Data archived to oh-archive-bucket")
+                last_archive_time = current_time  # Update last archive time
+            except Exception as e:
+                print(f"Failed to archive data: {e}")
 
 except KeyboardInterrupt:
     print("Data collection stopped.")
